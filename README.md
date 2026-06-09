@@ -1,6 +1,6 @@
 <div align="center">
   <h1>🚀 EquityFlow</h1>
-  <p>A comprehensive, full-stack trading and investment platform, inspired by Zerodha.</p>
+  <p>A full-stack stock trading and portfolio management platform that enables users to track holdings, manage positions, visualize market performance, and execute simulated trades through an intuitive dashboard.</p>
   
   <p>
     <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
