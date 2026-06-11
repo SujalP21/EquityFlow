@@ -1,55 +1,26 @@
-import React, { useState, useEffect } from "react";
-import axios, { all } from "axios";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import Positions from "./Positions";
+import { holdings as fallbackHoldings, sectorExposure } from "../data/data";
 import { VerticalGraph } from "./VerticalGraph";
 
-// import { holdings } from "../data/data";
+const formatNumber = (value) =>
+  value.toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
-const Holdings = () => {
-  const [allHoldings, setAllHoldings] = useState([]);
-
-  useEffect(() => {
-    axios.get("http://localhost:3002/allHoldings").then((res) => {
-      // console.log(res.data);
-      setAllHoldings(res.data);
-    });
-  }, []);
-
-  // const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  const labels = allHoldings.map((subArray) => subArray["name"]);
-
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Stock Price",
-        data: allHoldings.map((stock) => stock.price),
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-    ],
-  };
-
-  // export const data = {
-  //   labels,
-  //   datasets: [
-  // {
-  //   label: 'Dataset 1',
-  //   data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
-  //   backgroundColor: 'rgba(255, 99, 132, 0.5)',
-  // },
-  //     {
-  //       label: 'Dataset 2',
-  //       data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
-  //       backgroundColor: 'rgba(53, 162, 235, 0.5)',
-  //     },
-  //   ],
-  // };
+const HoldingsTable = ({ holdings }) => {
+  if (!holdings.length) {
+    return (
+      <div className="empty-state">
+        <h3>No holdings yet</h3>
+        <p>Add holdings to see value, returns, and sector exposure.</p>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <h3 className="title">Holdings ({allHoldings.length})</h3>
-
-      <div className="order-table">
-        <table>
+    <div className="order-table">
+      <table>
+        <thead>
           <tr>
             <th>Instrument</th>
             <th>Qty.</th>
@@ -60,51 +31,165 @@ const Holdings = () => {
             <th>Net chg.</th>
             <th>Day chg.</th>
           </tr>
-
-          {allHoldings.map((stock, index) => {
+        </thead>
+        <tbody>
+          {holdings.map((stock, index) => {
             const curValue = stock.price * stock.qty;
-            const isProfit = curValue - stock.avg * stock.qty >= 0.0;
+            const pnl = curValue - stock.avg * stock.qty;
+            const isProfit = pnl >= 0.0;
             const profClass = isProfit ? "profit" : "loss";
             const dayClass = stock.isLoss ? "loss" : "profit";
 
             return (
-              <tr key={index}>
-                <td>{stock.name}</td>
-                <td>{stock.qty}</td>
-                <td>{stock.avg.toFixed(2)}</td>
-                <td>{stock.price.toFixed(2)}</td>
-                <td>{curValue.toFixed(2)}</td>
-                <td className={profClass}>
-                  {(curValue - stock.avg * stock.qty).toFixed(2)}
+              <tr key={`${stock.name}-${index}`}>
+                <td data-label="Instrument">{stock.name}</td>
+                <td data-label="Qty.">{stock.qty}</td>
+                <td data-label="Avg. cost">{stock.avg.toFixed(2)}</td>
+                <td data-label="LTP">{stock.price.toFixed(2)}</td>
+                <td data-label="Cur. val">{curValue.toFixed(2)}</td>
+                <td data-label="P&L" className={profClass}>
+                  {pnl.toFixed(2)}
                 </td>
-                <td className={profClass}>{stock.net}</td>
-                <td className={dayClass}>{stock.day}</td>
+                <td data-label="Net chg." className={profClass}>
+                  {stock.net}
+                </td>
+                <td data-label="Day chg." className={dayClass}>
+                  {stock.day}
+                </td>
               </tr>
             );
           })}
-        </table>
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const Holdings = () => {
+  const [activeTab, setActiveTab] = useState("holdings");
+  const [remoteHoldings, setRemoteHoldings] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/allHoldings")
+      .then((res) => {
+        setRemoteHoldings(res.data);
+      })
+      .catch(() => {
+        setRemoteHoldings([]);
+      });
+  }, []);
+
+  const allHoldings = remoteHoldings.length ? remoteHoldings : fallbackHoldings;
+
+  const totals = useMemo(() => {
+    const invested = allHoldings.reduce(
+      (sum, stock) => sum + stock.avg * stock.qty,
+      0
+    );
+    const current = allHoldings.reduce(
+      (sum, stock) => sum + stock.price * stock.qty,
+      0
+    );
+    const pnl = current - invested;
+    return { invested, current, pnl };
+  }, [allHoldings]);
+
+  const chartData = {
+    labels: allHoldings.map((stock) => stock.name),
+    datasets: [
+      {
+        label: "Current value",
+        data: allHoldings.map((stock) => stock.price * stock.qty),
+        backgroundColor: "#285e4d",
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  return (
+    <section className="dashboard-page">
+      <div className="page-header">
+        <div>
+          <p className="eyebrow">Portfolio</p>
+          <h1>Holdings and positions in one workspace</h1>
+        </div>
       </div>
 
-      <div className="row">
-        <div className="col">
-          <h5>
-            29,875.<span>55</span>{" "}
-          </h5>
-          <p>Total investment</p>
-        </div>
-        <div className="col">
-          <h5>
-            31,428.<span>95</span>{" "}
-          </h5>
-          <p>Current value</p>
-        </div>
-        <div className="col">
-          <h5>1,553.40 (+5.20%)</h5>
-          <p>P&L</p>
-        </div>
+      <div className="metric-grid">
+        <article className="metric-card">
+          <span>Total investment</span>
+          <strong>{formatNumber(totals.invested)}</strong>
+          <p>Cost basis</p>
+        </article>
+        <article className="metric-card">
+          <span>Current value</span>
+          <strong>{formatNumber(totals.current)}</strong>
+          <p>Marked to latest price</p>
+        </article>
+        <article className="metric-card">
+          <span>Unrealized P&L</span>
+          <strong className={totals.pnl >= 0 ? "positive" : "negative"}>
+            {totals.pnl >= 0 ? "+" : ""}
+            {formatNumber(totals.pnl)}
+          </strong>
+          <p>{((totals.pnl / totals.invested) * 100).toFixed(2)}% return</p>
+        </article>
       </div>
-      <VerticalGraph data={data} />
-    </>
+
+      <section className="panel">
+        <div className="panel__header">
+          <div>
+            <p className="eyebrow">Sector exposure</p>
+            <h2>Summary cards</h2>
+          </div>
+        </div>
+        <div className="sector-grid">
+          {sectorExposure.map((sector) => (
+            <article className="sector-card" key={sector.name}>
+              <div>
+                <strong>{sector.name}</strong>
+                <span>{sector.value}</span>
+              </div>
+              <div className="sector-card__bar">
+                <span style={{ width: `${sector.weight}%` }} />
+              </div>
+              <p>{sector.weight}% - {sector.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="tabs" role="tablist" aria-label="Portfolio tabs">
+          <button
+            className={activeTab === "holdings" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("holdings")}
+            type="button"
+          >
+            Holdings
+          </button>
+          <button
+            className={activeTab === "positions" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("positions")}
+            type="button"
+          >
+            Positions
+          </button>
+        </div>
+
+        {activeTab === "holdings" ? (
+          <>
+            <HoldingsTable holdings={allHoldings} />
+            <div className="chart-panel">
+              <VerticalGraph data={chartData} />
+            </div>
+          </>
+        ) : (
+          <Positions />
+        )}
+      </section>
+    </section>
   );
 };
 

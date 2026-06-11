@@ -4,58 +4,66 @@ export const watchlist = [
     price: 1555.45,
     percent: "-1.60%",
     isDown: true,
+    signal: "Watch earnings drift",
   },
   {
     name: "ONGC",
     price: 116.8,
     percent: "-0.09%",
     isDown: true,
+    signal: "Energy exposure",
   },
   {
     name: "TCS",
     price: 3194.8,
     percent: "-0.25%",
     isDown: true,
+    signal: "Technology peer",
   },
   {
     name: "KPITTECH",
     price: 266.45,
     percent: "3.54%",
     isDown: false,
+    signal: "Momentum review",
   },
   {
     name: "QUICKHEAL",
     price: 308.55,
     percent: "-0.15%",
     isDown: true,
+    signal: "Small position",
   },
   {
     name: "WIPRO",
     price: 577.75,
     percent: "0.32%",
     isDown: false,
+    signal: "IT services",
   },
   {
     name: "M&M",
     price: 779.8,
     percent: "-0.01%",
     isDown: true,
+    signal: "Auto allocation",
   },
   {
     name: "RELIANCE",
     price: 2112.4,
     percent: "1.44%",
     isDown: false,
+    signal: "Large-cap anchor",
   },
   {
     name: "HUL",
     price: 512.4,
     percent: "1.04%",
     isDown: false,
+    signal: "Consumer defensive",
   },
 ];
 
-// holdings
 export const holdings = [
   {
     name: "BHARTIARTL",
@@ -64,6 +72,7 @@ export const holdings = [
     price: 541.15,
     net: "+0.58%",
     day: "+2.99%",
+    sector: "Communication",
   },
   {
     name: "HDFCBANK",
@@ -72,6 +81,7 @@ export const holdings = [
     price: 1522.35,
     net: "+10.04%",
     day: "+0.11%",
+    sector: "Financials",
   },
   {
     name: "HINDUNILVR",
@@ -80,6 +90,7 @@ export const holdings = [
     price: 2417.4,
     net: "+3.49%",
     day: "+0.21%",
+    sector: "Consumer",
   },
   {
     name: "INFY",
@@ -89,6 +100,7 @@ export const holdings = [
     net: "+15.18%",
     day: "-1.60%",
     isLoss: true,
+    sector: "Technology",
   },
   {
     name: "ITC",
@@ -97,6 +109,7 @@ export const holdings = [
     price: 207.9,
     net: "+2.92%",
     day: "+0.80%",
+    sector: "Consumer",
   },
   {
     name: "KPITTECH",
@@ -105,6 +118,7 @@ export const holdings = [
     price: 266.45,
     net: "+6.45%",
     day: "+3.54%",
+    sector: "Technology",
   },
   {
     name: "M&M",
@@ -114,6 +128,7 @@ export const holdings = [
     net: "-3.72%",
     day: "-0.01%",
     isLoss: true,
+    sector: "Automobile",
   },
   {
     name: "RELIANCE",
@@ -122,6 +137,7 @@ export const holdings = [
     price: 2112.4,
     net: "-3.71%",
     day: "+1.44%",
+    sector: "Energy",
   },
   {
     name: "SBIN",
@@ -131,6 +147,7 @@ export const holdings = [
     net: "+32.63%",
     day: "-0.34%",
     isLoss: true,
+    sector: "Financials",
   },
   {
     name: "SGBMAY29",
@@ -139,6 +156,7 @@ export const holdings = [
     price: 4719.0,
     net: "-0.17%",
     day: "+0.15%",
+    sector: "Sovereign gold",
   },
   {
     name: "TATAPOWER",
@@ -148,6 +166,7 @@ export const holdings = [
     net: "+19.15%",
     day: "-0.24%",
     isLoss: true,
+    sector: "Utilities",
   },
   {
     name: "TCS",
@@ -157,6 +176,7 @@ export const holdings = [
     net: "+5.03%",
     day: "-0.25%",
     isLoss: true,
+    sector: "Technology",
   },
   {
     name: "WIPRO",
@@ -165,10 +185,10 @@ export const holdings = [
     price: 577.75,
     net: "+18.08%",
     day: "+0.32%",
+    sector: "Technology",
   },
 ];
 
-// positions
 export const positions = [
   {
     product: "CNC",
@@ -189,5 +209,30 @@ export const positions = [
     net: "+10.04%",
     day: "-1.35%",
     isLoss: true,
+  },
+];
+
+export const sectorExposure = [
+  { name: "Technology", weight: 31, value: "9.8k", note: "Largest cluster" },
+  { name: "Financials", weight: 24, value: "7.5k", note: "Healthy anchor" },
+  { name: "Consumer", weight: 18, value: "5.6k", note: "Defensive mix" },
+  { name: "Energy", weight: 11, value: "3.4k", note: "Single-stock led" },
+];
+
+export const insightCards = [
+  {
+    title: "Portfolio Health Score is stable",
+    severity: "Stable",
+    text: "The sample score is supported by positive total return and a diversified top-four sector mix.",
+  },
+  {
+    title: "Technology is the largest exposure",
+    severity: "Watch",
+    text: "Technology represents 31% of tracked holdings. Review if this remains intentional.",
+  },
+  {
+    title: "Day drag is concentrated in IT names",
+    severity: "Review",
+    text: "INFY, TCS, and related watchlist names are soft today while total portfolio return remains positive.",
   },
 ];

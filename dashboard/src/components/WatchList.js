@@ -1,6 +1,4 @@
-import React, { useState, useContext } from "react";
-
-import axios from "axios";
+import React, { useContext, useMemo, useState } from "react";
 
 import GeneralContext from "./GeneralContext";
 
@@ -14,118 +12,142 @@ import {
 } from "@mui/icons-material";
 
 import { watchlist } from "../data/data";
-import { DoughnutChart } from "./DoughnoutChart";
-
-const labels = watchlist.map((subArray) => subArray["name"]);
 
 const WatchList = () => {
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Price",
-        data: watchlist.map((stock) => stock.price),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.5)",
-          "rgba(54, 162, 235, 0.5)",
-          "rgba(255, 206, 86, 0.5)",
-          "rgba(75, 192, 192, 0.5)",
-          "rgba(153, 102, 255, 0.5)",
-          "rgba(255, 159, 64, 0.5)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
+  const [query, setQuery] = useState("");
+  const [selectedAsset, setSelectedAsset] = useState(watchlist[0]);
 
-  // export const data = {
-  //   labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-  // datasets: [
-  //   {
-  //     label: "# of Votes",
-  //     data: [12, 19, 3, 5, 2, 3],
-  //     backgroundColor: [
-  //       "rgba(255, 99, 132, 0.2)",
-  //       "rgba(54, 162, 235, 0.2)",
-  //       "rgba(255, 206, 86, 0.2)",
-  //       "rgba(75, 192, 192, 0.2)",
-  //       "rgba(153, 102, 255, 0.2)",
-  //       "rgba(255, 159, 64, 0.2)",
-  //     ],
-  //     borderColor: [
-  //       "rgba(255, 99, 132, 1)",
-  //       "rgba(54, 162, 235, 1)",
-  //       "rgba(255, 206, 86, 1)",
-  //       "rgba(75, 192, 192, 1)",
-  //       "rgba(153, 102, 255, 1)",
-  //       "rgba(255, 159, 64, 1)",
-  //     ],
-  //     borderWidth: 1,
-  //   },
-  // ],
-  // };
+  const filteredWatchlist = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    if (!term) return watchlist;
+    return watchlist.filter((stock) => stock.name.toLowerCase().includes(term));
+  }, [query]);
 
   return (
-    <div className="watchlist-container">
-      <div className="search-container">
-        <input
-          type="text"
-          name="search"
-          id="search"
-          placeholder="Search eg:infy, bse, nifty fut weekly, gold mcx"
-          className="search"
-        />
-        <span className="counts"> {watchlist.length} / 50</span>
+    <section className="dashboard-page">
+      <div className="page-header">
+        <div>
+          <p className="eyebrow">Watchlist</p>
+          <h1>Tracked assets and local signals</h1>
+        </div>
+        <span className="page-header__meta">{watchlist.length} tracked</span>
       </div>
 
-      <ul className="list">
-        {watchlist.map((stock, index) => {
-          return <WatchListItem stock={stock} key={index} />;
-        })}
-      </ul>
+      <div className="watchlist-layout">
+        <section className="panel watchlist-panel">
+          <label className="field-label" htmlFor="watchlist-search">
+            Search this watchlist
+          </label>
+          <input
+            type="text"
+            name="search"
+            id="watchlist-search"
+            placeholder="Search symbols"
+            className="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
 
-      <DoughnutChart data={data} />
-    </div>
+          <div className="watchlist-tabs" aria-label="Saved watchlists">
+            <button type="button" className="active">
+              Core
+            </button>
+            <button type="button">Review</button>
+            <button type="button">Long term</button>
+          </div>
+
+          {filteredWatchlist.length ? (
+            <ul className="list">
+              {filteredWatchlist.map((stock) => (
+                <WatchListItem
+                  stock={stock}
+                  key={stock.name}
+                  isSelected={selectedAsset?.name === stock.name}
+                  onSelect={setSelectedAsset}
+                />
+              ))}
+            </ul>
+          ) : (
+            <div className="empty-state">
+              <h3>No matching assets</h3>
+              <p>Clear the local watchlist search to see all tracked symbols.</p>
+            </div>
+          )}
+        </section>
+
+        <AssetDetail stock={selectedAsset} />
+      </div>
+    </section>
   );
 };
 
 export default WatchList;
 
-const WatchListItem = ({ stock }) => {
-  const [showWatchlistActions, setShowWatchlistActions] = useState(false);
+const WatchListItem = ({ stock, isSelected, onSelect }) => {
+  return (
+    <li className={isSelected ? "selected" : ""}>
+      <button className="watchlist-row" type="button" onClick={() => onSelect(stock)}>
+        <div>
+          <strong className={stock.isDown ? "down" : "up"}>{stock.name}</strong>
+          <span>{stock.signal}</span>
+        </div>
+        <div className="item-info">
+          <span className={stock.isDown ? "negative" : "positive"}>
+            {stock.percent}
+          </span>
+          {stock.isDown ? (
+            <KeyboardArrowDown className="negative" />
+          ) : (
+            <KeyboardArrowUp className="positive" />
+          )}
+          <strong>{stock.price.toFixed(2)}</strong>
+        </div>
+      </button>
+    </li>
+  );
+};
 
-  const handleMouseEnter = (e) => {
-    setShowWatchlistActions(true);
-  };
-
-  const handleMouseLeave = (e) => {
-    setShowWatchlistActions(false);
-  };
+const AssetDetail = ({ stock }) => {
+  if (!stock) {
+    return (
+      <section className="panel asset-detail">
+        <div className="empty-state">
+          <h3>Select an asset</h3>
+          <p>Choose a watchlist row to review price, signal, and actions.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <div className="item">
-        <p className={stock.isDown ? "down" : "up"}>{stock.name}</p>
-        <div className="itemInfo">
-          <span className="percent">{stock.percent}</span>
-          {stock.isDown ? (
-            <KeyboardArrowDown className="down" />
-          ) : (
-            <KeyboardArrowUp className="down" />
-          )}
-          <span className="price">{stock.price}</span>
+    <section className="panel asset-detail">
+      <div className="panel__header">
+        <div>
+          <p className="eyebrow">Asset detail</p>
+          <h2>{stock.name}</h2>
         </div>
+        <span className={stock.isDown ? "negative" : "positive"}>
+          {stock.percent}
+        </span>
       </div>
-      {showWatchlistActions && <WatchListActions uid={stock.name} />}
-    </li>
+
+      <div className="asset-price-card">
+        <span>Last traded price</span>
+        <strong>{stock.price.toFixed(2)}</strong>
+        <p>{stock.signal}</p>
+      </div>
+
+      <div className="mini-chart" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+
+      <WatchListActions uid={stock.name} />
+    </section>
   );
 };
 
@@ -137,41 +159,33 @@ const WatchListActions = ({ uid }) => {
   };
 
   return (
-    <span className="actions">
-      <span>
-        <Tooltip
-          title="Buy (B)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-          onClick={handleBuyClick}
-        >
-          <button className="buy">Buy</button>
-        </Tooltip>
-        <Tooltip
-          title="Sell (S)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="sell">Sell</button>
-        </Tooltip>
-        <Tooltip
-          title="Analytics (A)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="action">
-            <BarChartOutlined className="icon" />
-          </button>
-        </Tooltip>
-        <Tooltip title="More" placement="top" arrow TransitionComponent={Grow}>
-          <button className="action">
-            <MoreHoriz className="icon" />
-          </button>
-        </Tooltip>
-      </span>
-    </span>
+    <div className="asset-actions">
+      <Tooltip
+        title="Buy"
+        placement="top"
+        arrow
+        TransitionComponent={Grow}
+        onClick={handleBuyClick}
+      >
+        <button className="buy" type="button">
+          Buy
+        </button>
+      </Tooltip>
+      <Tooltip title="Sell" placement="top" arrow TransitionComponent={Grow}>
+        <button className="sell" type="button">
+          Sell
+        </button>
+      </Tooltip>
+      <Tooltip title="Analytics" placement="top" arrow TransitionComponent={Grow}>
+        <button className="action" type="button">
+          <BarChartOutlined className="icon" />
+        </button>
+      </Tooltip>
+      <Tooltip title="More" placement="top" arrow TransitionComponent={Grow}>
+        <button className="action" type="button">
+          <MoreHoriz className="icon" />
+        </button>
+      </Tooltip>
+    </div>
   );
 };

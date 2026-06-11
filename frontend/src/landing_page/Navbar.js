@@ -1,60 +1,43 @@
 import React from "react";
+import { Link, NavLink } from "react-router-dom";
 
 function Navbar() {
+  const navItems = [
+    { label: "Product", to: "/product" },
+    { label: "Analytics", to: "/" },
+    { label: "Pricing", to: "/pricing" },
+    { label: "Support", to: "/support" },
+  ];
+
   return (
-    <nav
-      class="navbar navbar-expand-lg border-bottom"
-      style={{ backgroundColor: "#FFF" }}
-    >
-      <div class="container p-2">
-        <a class="navbar-brand" href="#">
-          <img
-            src="media/images/logo.svg"
-            style={{ width: "25%" }}
-            alt="Logo"
-          />
-        </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <form class="d-flex" role="search">
-            <ul class="navbar-nav mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">
-                  Signup
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="#">
-                  About
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="#">
-                  Product
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="#">
-                  Pricing
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="#">
-                  Support
-                </a>
-              </li>
-            </ul>
-          </form>
+    <nav className="site-nav" aria-label="Primary navigation">
+      <div className="site-nav__inner">
+        <Link className="brand-mark" to="/" aria-label="EquityFlow home">
+          <span className="brand-mark__glyph">EF</span>
+          <span>EquityFlow</span>
+        </Link>
+
+        <div className="site-nav__links">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.to}
+              className={({ isActive }) =>
+                isActive ? "site-nav__link is-active" : "site-nav__link"
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+
+        <div className="site-nav__actions">
+          <Link className="site-nav__link" to="/about">
+            About
+          </Link>
+          <Link className="button button--primary" to="/signup">
+            Start analyzing
+          </Link>
         </div>
       </div>
     </nav>

@@ -21,13 +21,25 @@ ChartJS.register(
 
 export const options = {
   responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: "top",
+      display: false,
     },
     title: {
-      display: true,
-      text: "Holdings",
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      grid: {
+        display: false,
+      },
+    },
+    y: {
+      grid: {
+        color: "#e6e0d7",
+      },
     },
   },
 };

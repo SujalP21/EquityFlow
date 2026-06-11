@@ -4,22 +4,13 @@ import Menu from "./Menu";
 
 const TopBar = () => {
   return (
-    <div className="topbar-container">
-      <div className="indices-container">
-        <div className="nifty">
-          <p className="index">NIFTY 50</p>
-          <p className="index-points">{100.2} </p>
-          <p className="percent"> </p>
-        </div>
-        <div className="sensex">
-          <p className="index">SENSEX</p>
-          <p className="index-points">{100.2}</p>
-          <p className="percent"></p>
-        </div>
-      </div>
-
+    <header className="topbar-container">
       <Menu />
-    </div>
+      <div className="topbar-status">
+        <span>Light analytics workspace</span>
+        <strong>Health score enabled</strong>
+      </div>
+    </header>
   );
 };
 

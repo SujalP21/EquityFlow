@@ -1,47 +1,33 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Universe() {
   return (
-    <div className="container mt-5">
-      <div className="row text-center">
-        <h1>The Zerodha Universe</h1>
+    <section className="analytics-showcase">
+      <div>
+        <p className="eyebrow">Signature view</p>
+        <h2>Portfolio health plus sector exposure.</h2>
         <p>
-          Extend your trading and investment experience even further with our
-          partner platforms
+          The redesigned dashboard uses health scoring and exposure cards as
+          first-class product elements, making EquityFlow feel like its own
+          analytics platform rather than a broker interface.
         </p>
-
-        <div className="col-4 p-3 mt-5">
-          <img src="media/images/smallcaseLogo.png" />
-          <p className="text-small text-muted">Thematic investment platform</p>
-        </div>
-        <div className="col-4 p-3 mt-5">
-          <img src="media/images/smallcaseLogo.png" />
-          <p className="text-small text-muted">Thematic investment platform</p>
-        </div>
-        <div className="col-4 p-3 mt-5">
-          <img src="media/images/smallcaseLogo.png" />
-          <p className="text-small text-muted">Thematic investment platform</p>
-        </div>
-        <div className="col-4 p-3 mt-5">
-          <img src="media/images/smallcaseLogo.png" />
-          <p className="text-small text-muted">Thematic investment platform</p>
-        </div>
-        <div className="col-4 p-3 mt-5">
-          <img src="media/images/smallcaseLogo.png" />
-          <p className="text-small text-muted">Thematic investment platform</p>
-        </div>
-        <div className="col-4 p-3 mt-5">
-          <img src="media/images/smallcaseLogo.png" />
-          <p className="text-small text-muted">Thematic investment platform</p>
-        </div>
-        <button
-          className="p-2 btn btn-primary fs-5 mb-5"
-          style={{ width: "20%", margin: "0 auto" }}
-        >
-          Signup Now
-        </button>
+        <Link className="button button--secondary" to="/signup">
+          Preview workflow
+        </Link>
       </div>
-    </div>
+      <div className="showcase-card">
+        <div className="showcase-card__score">
+          <span>Health score</span>
+          <strong>82</strong>
+        </div>
+        <div className="exposure-bars">
+          <span style={{ width: "78%" }}>Financials</span>
+          <span style={{ width: "62%" }}>Technology</span>
+          <span style={{ width: "38%" }}>Consumer</span>
+        </div>
+      </div>
+    </section>
   );
 }
 
