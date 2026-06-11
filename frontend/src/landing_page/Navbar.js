@@ -1,12 +1,18 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
+import { DASHBOARD_ROUTES, PUBLIC_ROUTES } from "../constants/routes";
 
 function Navbar() {
+  const { isAuthenticated } = useAuth();
+  const dashboardTarget = isAuthenticated
+    ? DASHBOARD_ROUTES.OVERVIEW
+    : PUBLIC_ROUTES.LOGIN;
   const navItems = [
-    { label: "Product", to: "/product" },
-    { label: "Analytics", to: "/" },
-    { label: "Pricing", to: "/pricing" },
-    { label: "Support", to: "/support" },
+    { label: "Product", to: PUBLIC_ROUTES.PRODUCT },
+    { label: "Analytics", to: PUBLIC_ROUTES.HOME },
+    { label: "Pricing", to: PUBLIC_ROUTES.PRICING },
+    { label: "Support", to: PUBLIC_ROUTES.SUPPORT },
   ];
 
   return (
@@ -32,11 +38,11 @@ function Navbar() {
         </div>
 
         <div className="site-nav__actions">
-          <Link className="site-nav__link" to="/about">
+          <Link className="site-nav__link" to={PUBLIC_ROUTES.ABOUT}>
             About
           </Link>
-          <Link className="button button--primary" to="/signup">
-            Start analyzing
+          <Link className="button button--primary" to={dashboardTarget}>
+            {isAuthenticated ? "Dashboard" : "Login"}
           </Link>
         </div>
       </div>

@@ -4,19 +4,33 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const { HoldingsModel } = require("./model/HoldingsModel");
 
 const { PositionsModel } = require("./model/PositionsModel");
-const { OrdersModel } = require("./model/OrdersModel");
+const { authRoutes } = require("./routes/authRoutes");
+const { orderRoutes } = require("./routes/orderRoutes");
+const { stockRoutes } = require("./routes/stockRoutes");
+const { authMiddleware } = require("./middleware/authMiddleware");
 
 const PORT = process.env.PORT || 3002;
 const uri = process.env.MONGO_URL;
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
+app.use(cookieParser());
+
+app.use("/auth", authRoutes);
+app.use(orderRoutes);
+app.use(stockRoutes);
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
@@ -187,31 +201,25 @@ app.use(bodyParser.json());
 //   res.send("Done!");
 // });
 
-app.get("/allHoldings", async (req, res) => {
-  let allHoldings = await HoldingsModel.find({});
+app.get("/allHoldings", authMiddleware, async (req, res) => {
+  let allHoldings = await HoldingsModel.find({ userId: req.user.id });
   res.json(allHoldings);
 });
 
-app.get("/allPositions", async (req, res) => {
-  let allPositions = await PositionsModel.find({});
+app.get("/allPositions", authMiddleware, async (req, res) => {
+  let allPositions = await PositionsModel.find({ userId: req.user.id });
   res.json(allPositions);
 });
 
-app.post("/newOrder", async (req, res) => {
-  let newOrder = new OrdersModel({
-    name: req.body.name,
-    qty: req.body.qty,
-    price: req.body.price,
-    mode: req.body.mode,
+mongoose
+  .connect(uri, { serverSelectionTimeoutMS: 10000 })
+  .then(() => {
+    console.log("DB started!");
+    app.listen(PORT, () => {
+      console.log("App started!");
+    });
+  })
+  .catch((error) => {
+    console.error("DB connection failed:", error.message);
+    process.exit(1);
   });
-
-  newOrder.save();
-
-  res.send("Order saved!");
-});
-
-app.listen(PORT, () => {
-  console.log("App started!");
-  mongoose.connect(uri);
-  console.log("DB started!");
-});

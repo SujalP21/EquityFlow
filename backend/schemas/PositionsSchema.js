@@ -1,14 +1,49 @@
 const { Schema } = require("mongoose");
 
 const PositionsSchema = new Schema({
-  product: String,
-  name: String,
-  qty: Number,
-  avg: Number,
-  price: Number,
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    index: true,
+  },
+  product: {
+    type: String,
+    required: true,
+    default: "CNC",
+    trim: true,
+  },
+  symbol: {
+    type: String,
+    uppercase: true,
+    trim: true,
+  },
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  qty: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  avg: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
   net: String,
   day: String,
   isLoss: Boolean,
 });
+
+PositionsSchema.index({ userId: 1, name: 1, product: 1 });
+PositionsSchema.index({ userId: 1, symbol: 1, product: 1 });
 
 module.exports = { PositionsSchema };
