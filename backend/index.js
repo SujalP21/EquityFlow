@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const { HoldingsModel } = require("./model/HoldingsModel");
 
 const { PositionsModel } = require("./model/PositionsModel");
+const { analyticsRoutes } = require("./routes/analyticsRoutes");
 const { authRoutes } = require("./routes/authRoutes");
 const { orderRoutes } = require("./routes/orderRoutes");
 const { stockRoutes } = require("./routes/stockRoutes");
@@ -31,6 +32,7 @@ app.use(cookieParser());
 app.use("/auth", authRoutes);
 app.use(orderRoutes);
 app.use(stockRoutes);
+app.use(analyticsRoutes);
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [

@@ -52,12 +52,21 @@ function Register() {
   };
 
   return (
-    <section className="page-hero">
-      <p className="eyebrow">Register</p>
-      <h1>Create your EquityFlow account.</h1>
-      <p>Use email and password authentication to access the dashboard.</p>
+    <section className="auth-shell">
+      <div className="auth-copy">
+        <p className="eyebrow">Register</p>
+        <h1>Create your EquityFlow workspace.</h1>
+        <p>
+          Use email and password authentication to access portfolio analytics,
+          watchlists, stock detail pages, and order history.
+        </p>
+        <div className="auth-preview">
+          <span>Included after signup</span>
+          <strong>Health Score · Watchlist · Trading Analytics</strong>
+        </div>
+      </div>
 
-      <form className="signup-panel" onSubmit={handleSubmit}>
+      <form className="signup-panel auth-panel" onSubmit={handleSubmit}>
         <label>
           Name
           <input

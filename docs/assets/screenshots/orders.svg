@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-label="EquityFlow orders analytics page preview">
+  <rect width="1200" height="760" fill="#f7f5f0"/>
+  <rect x="0" y="0" width="216" height="760" fill="#ffffff" stroke="#ddd8ce"/>
+  <text x="252" y="74" fill="#17201a" font-family="Inter, Arial" font-size="30" font-weight="800">Trading analytics workspace</text>
+  <rect x="252" y="112" width="892" height="82" rx="8" fill="#ffffff" stroke="#ddd8ce"/>
+  <text x="278" y="146" fill="#687067" font-family="Inter, Arial" font-size="12" font-weight="800">TOTAL ORDERS</text>
+  <text x="278" y="176" fill="#17201a" font-family="Inter, Arial" font-size="24" font-weight="800">18</text>
+  <text x="504" y="176" fill="#16834a" font-family="Inter, Arial" font-size="24" font-weight="800">16</text>
+  <text x="730" y="176" fill="#b43b3b" font-family="Inter, Arial" font-size="24" font-weight="800">2</text>
+  <text x="956" y="176" fill="#17201a" font-family="Inter, Arial" font-size="24" font-weight="800">88.89%</text>
+  <rect x="252" y="222" width="892" height="260" rx="8" fill="#ffffff" stroke="#ddd8ce"/>
+  <polyline points="292,430 430,384 568,398 706,316 844,338 1084,280" fill="none" stroke="#285e4d" stroke-width="4"/>
+  <rect x="252" y="510" width="560" height="178" rx="8" fill="#ffffff" stroke="#ddd8ce"/>
+  <text x="278" y="548" fill="#17201a" font-family="Inter, Arial" font-size="18" font-weight="800">Orders Table</text>
+  <text x="278" y="590" fill="#16834a" font-family="Inter, Arial" font-size="15" font-weight="800">BUY INFY EXECUTED</text>
+  <text x="278" y="626" fill="#b43b3b" font-family="Inter, Arial" font-size="15" font-weight="800">SELL ADANIGREEN REJECTED</text>
+  <rect x="842" y="510" width="302" height="178" rx="8" fill="#ffffff" stroke="#ddd8ce"/>
+  <text x="868" y="548" fill="#17201a" font-family="Inter, Arial" font-size="18" font-weight="800">Most Traded</text>
+  <text x="868" y="590" fill="#285e4d" font-family="Inter, Arial" font-size="15" font-weight="800">INFY · 5 trades</text>
+</svg>

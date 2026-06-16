@@ -41,12 +41,21 @@ function Login() {
   };
 
   return (
-    <section className="page-hero">
-      <p className="eyebrow">Login</p>
-      <h1>Welcome back to EquityFlow.</h1>
-      <p>Sign in to continue to your portfolio workspace.</p>
+    <section className="auth-shell">
+      <div className="auth-copy">
+        <p className="eyebrow">Login</p>
+        <h1>Return to your portfolio desk.</h1>
+        <p>
+          Sign in to review portfolio health, tracked stocks, orders, and
+          trading activity in the same focused workspace.
+        </p>
+        <div className="auth-preview">
+          <span>Protected workspace</span>
+          <strong>Overview · Portfolio · Orders</strong>
+        </div>
+      </div>
 
-      <form className="signup-panel" onSubmit={handleSubmit}>
+      <form className="signup-panel auth-panel" onSubmit={handleSubmit}>
         <label>
           Email
           <input

@@ -30,6 +30,8 @@ import PortfolioPage from "./pages/dashboard/PortfolioPage";
 import WatchlistPage from "./pages/dashboard/WatchlistPage";
 import InsightsPage from "./pages/dashboard/InsightsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import StockDetailPage from "./pages/dashboard/StockDetailPage";
+import Orders from "./dashboard/components/Orders";
 
 function PublicLayout() {
   return (
@@ -69,7 +71,8 @@ root.render(
             <Route path={DASHBOARD_ROUTES.WATCHLIST} element={<WatchlistPage />} />
             <Route path={DASHBOARD_ROUTES.INSIGHTS} element={<InsightsPage />} />
             <Route path={DASHBOARD_ROUTES.SETTINGS} element={<SettingsPage />} />
-            <Route path="/orders" element={<Navigate to={DASHBOARD_ROUTES.PORTFOLIO} replace />} />
+            <Route path={DASHBOARD_ROUTES.STOCK_DETAIL} element={<StockDetailPage />} />
+            <Route path="/orders" element={<div className="dashboard-container"><div className="content"><Orders /></div></div>} />
             <Route path="/holdings" element={<Navigate to={DASHBOARD_ROUTES.PORTFOLIO} replace />} />
             <Route path="/positions" element={<Navigate to={DASHBOARD_ROUTES.PORTFOLIO} replace />} />
             <Route path="/funds" element={<Navigate to={DASHBOARD_ROUTES.SETTINGS} replace />} />

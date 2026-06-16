@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { holdings as fallbackHoldings, insightCards, sectorExposure } from "../data/data";
+import { holdings as fallbackHoldings, insightCards } from "../data/data";
 import apiClient from "../../api/client";
+import { getOverview, getSectorExposure } from "../../api/analytics";
+import { formatCurrency, formatPercent } from "../../utils/formatters";
 
 const Apps = () => {
   const [remoteHoldings, setRemoteHoldings] = useState([]);
   const [didHoldingsRequestFail, setDidHoldingsRequestFail] = useState(false);
+  const [overview, setOverview] = useState(null);
+  const [sectorExposure, setSectorExposure] = useState([]);
 
   useEffect(() => {
     apiClient
@@ -17,10 +21,20 @@ const Apps = () => {
         setRemoteHoldings([]);
         setDidHoldingsRequestFail(true);
       });
+
+    Promise.all([getOverview(), getSectorExposure()])
+      .then(([overviewRes, sectorRes]) => {
+        setOverview(overviewRes.data);
+        setSectorExposure(sectorRes.data);
+      })
+      .catch(() => {
+        setOverview(null);
+        setSectorExposure([]);
+      });
   }, []);
 
   const holdings = didHoldingsRequestFail ? fallbackHoldings : remoteHoldings;
-  const healthScore = holdings.length ? 82 : 0;
+  const healthScore = overview?.healthScore || 0;
   const winners = holdings
     .map((stock) => ({
       name: stock.name,
@@ -56,10 +70,10 @@ const Apps = () => {
 
         <div className="metric-grid">
           {sectorExposure.slice(0, 3).map((sector) => (
-            <article className="metric-card" key={sector.name}>
-              <span>{sector.name}</span>
-              <strong>{sector.weight}%</strong>
-              <p>{sector.note}</p>
+            <article className="metric-card" key={sector.sector}>
+              <span>{sector.sector}</span>
+              <strong>{formatPercent(sector.percentage, { showSign: false })}</strong>
+              <p>{formatCurrency(sector.value)} allocated</p>
             </article>
           ))}
         </div>
@@ -102,7 +116,7 @@ const Apps = () => {
                   <strong>{stock.name}</strong>
                   <span className={stock.contribution >= 0 ? "positive" : "negative"}>
                     {stock.contribution >= 0 ? "+" : ""}
-                    {stock.contribution.toFixed(2)}
+                    {formatCurrency(stock.contribution)}
                   </span>
                 </div>
               ))}

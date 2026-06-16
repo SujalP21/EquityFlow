@@ -1,103 +1,223 @@
-<div align="center">
-  <h1>EquityFlow</h1>
-  <p>A light investment analytics workspace for portfolio health, sector exposure, watchlists, and insights.</p>
+# EquityFlow
 
-  <p>
-    <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
-    <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express.js" />
-    <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
-    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-    <img src="https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Chart.js" />
-  </p>
-</div>
+EquityFlow is a full-stack investment analytics platform with a warm-light
+trading workspace for portfolio review, watchlists, stock details, order
+history, and trading analytics.
 
-## About
+The project has evolved from a broker-style dashboard into a cohesive fintech
+product: public pages, authentication, portfolio analytics, stock metadata,
+charts, and trading workflows now live inside a single React frontend backed by
+an Express/MongoDB API.
 
-EquityFlow is a full-stack prototype for investment analytics. The product is
-organized around a calm dashboard experience: Overview, Portfolio, Watchlist,
-Insights, and Settings.
+## Screenshots
 
-The redesign positions EquityFlow as its own analytics platform instead of a
-broker-terminal clone. It keeps the existing React and Express structure while
-introducing a new light visual identity, Portfolio Health Score, Sector Exposure
-cards, tabbed Holdings and Positions, a dedicated Watchlist page, and an
-Insights workspace.
+| Landing | Overview |
+|---|---|
+| ![Landing page](docs/assets/screenshots/landing.svg) | ![Overview dashboard](docs/assets/screenshots/overview.svg) |
+
+| Portfolio | Watchlist |
+|---|---|
+| ![Portfolio page](docs/assets/screenshots/portfolio.svg) | ![Watchlist page](docs/assets/screenshots/watchlist.svg) |
+
+| Stock Detail | Orders |
+|---|---|
+| ![Stock detail page](docs/assets/screenshots/stock-detail.svg) | ![Orders page](docs/assets/screenshots/orders.svg) |
+
+| Insights | Mobile |
+|---|---|
+| ![Insights page](docs/assets/screenshots/insights.svg) | ![Mobile layout](docs/assets/screenshots/mobile.svg) |
 
 ## Features
 
-- Portfolio Health Score on Overview and Insights
-- Sector Exposure summary cards
-- Portfolio page with Holdings and Positions tabs
-- Dedicated Watchlist page with local watchlist search
-- Insight cards for concentration, contributors, and review prompts
-- Light, sober design system without dark mode, glassmorphism, or flashy gradients
+- JWT authentication with httpOnly cookie sessions.
+- Protected dashboard routes for Overview, Portfolio, Watchlist, Insights,
+  Settings, Orders, and Stock Detail pages.
+- Portfolio Health Score, allocation analytics, sector exposure, and top movers.
+- Holdings and Positions tabs inside the Portfolio workspace.
+- Stock catalogue and price-history backed Watchlist and Stock Detail pages.
+- Buy/Sell flow that creates immutable orders and updates holdings/positions.
+- Orders analytics workspace with execution rate, order timeline, most traded
+  symbols, and trading activity feed.
+- Responsive warm-light public pages aligned with the logged-in dashboard style.
 
 ## Tech Stack
+
+### Frontend
+
+- React 18
+- React Router
+- Axios
+- Recharts
+- Material UI icons
+- CSS with shared EquityFlow design tokens
 
 ### Backend
 
 - Node.js
-- Express.js
+- Express
 - MongoDB with Mongoose
-- CORS and dotenv
-
-### Dashboard
-
-- React 18
-- React Router
-- Material UI icons
-- Chart.js and react-chartjs-2
-- Axios
-
-### Landing Site
-
-- React 18
-- React Router
-- CSS-based responsive layout
+- JWT
+- bcryptjs
+- cookie-parser
+- CORS
+- dotenv
 
 ## Project Structure
 
 ```text
 EquityFlow/
-├── backend/    # Express API serving holdings, positions, and orders
-├── dashboard/  # React dashboard for analytics workflows
-└── frontend/   # React landing site
+├── backend/
+│   ├── data/                 # Seed stock and price-history data
+│   ├── middleware/           # Auth middleware
+│   ├── model/                # Mongoose models
+│   ├── routes/               # Auth, order, stock, analytics routes
+│   ├── schemas/              # Mongoose schemas
+│   ├── scripts/              # Seed and migration scripts
+│   ├── services/             # Trading engine and analytics services
+│   └── index.js              # Express app entry
+├── docs/assets/screenshots/  # README screenshot assets
+└── frontend/
+    ├── public/
+    └── src/
+        ├── api/              # API clients
+        ├── auth/             # AuthContext and route protection
+        ├── charts/           # Recharts components
+        ├── dashboard/        # Dashboard components and styles
+        ├── landing_page/     # Public pages
+        ├── layouts/          # Dashboard layout shell
+        ├── pages/            # Auth and dashboard page wrappers
+        └── utils/            # Formatters and analytics helpers
 ```
 
-## Getting Started
+## Setup
 
-### Backend
+### 1. Clone and install
+
+```bash
+git clone https://github.com/SujalP21/EquityFlow.git
+cd EquityFlow
+```
+
+Install backend dependencies:
 
 ```bash
 cd backend
 npm install
-npm start
 ```
 
-Create `backend/.env` with:
+Install frontend dependencies:
+
+```bash
+cd ../frontend
+npm install
+```
+
+### 2. Backend environment
+
+Create `backend/.env`:
 
 ```env
 PORT=3002
-MONGO_URL=your_mongodb_connection_string_here
+MONGO_URL=your_mongodb_connection_string
+CLIENT_URL=http://localhost:3000
+JWT_SECRET=replace_with_a_long_secret
+JWT_EXPIRES_IN=7d
+COOKIE_EXPIRES_DAYS=7
 ```
 
-### Dashboard
+### 3. Frontend environment
+
+Create `frontend/.env` if your backend is not running on the default port:
+
+```env
+REACT_APP_API_URL=http://localhost:3002
+```
+
+### 4. Seed stock data
+
+From `backend/`:
 
 ```bash
-cd dashboard
-npm install
+node scripts/seedStocks.js
+node scripts/backfillSymbolsFromStocks.js
+```
+
+If you already have legacy records without user ownership, attach them to a
+user by setting `USER_EMAIL` before running:
+
+```bash
+node scripts/attachUserIdToExistingData.js
+```
+
+### 5. Run locally
+
+Start the backend:
+
+```bash
+cd backend
 npm start
 ```
 
-### Landing Site
+Start the frontend in another terminal:
 
 ```bash
 cd frontend
-npm install
 npm start
+```
+
+Frontend runs on [http://localhost:3000](http://localhost:3000) by default.
+Backend defaults to [http://localhost:3002](http://localhost:3002).
+
+## Important Routes
+
+### Public
+
+- `/` - Landing page
+- `/about` - Product mission and principles
+- `/product` - Product modules
+- `/pricing` - Plan overview
+- `/support` - Support topics
+- `/login` - Login
+- `/register` and `/signup` - Register
+
+### Dashboard
+
+- `/overview` - Portfolio summary and recent trading activity
+- `/portfolio` - Holdings, Positions, allocation, and performance
+- `/watchlist` - Market watch and selected stock detail panel
+- `/orders` - Orders and trading analytics
+- `/insights` - Portfolio review prompts
+- `/settings` - Account/settings workspace
+- `/stock/:symbol` - Stock detail page
+
+## API Highlights
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/logout`
+- `GET /auth/me`
+- `GET /allHoldings`
+- `GET /allPositions`
+- `POST /newOrder`
+- `GET /orders`
+- `GET /stocks`
+- `GET /stocks/search?q=...`
+- `GET /stocks/:symbol`
+- `GET /stocks/:symbol/history?range=1M|3M|6M|1Y`
+- `GET /analytics/overview`
+- `GET /analytics/sector-exposure`
+- `GET /analytics/allocation`
+- `GET /analytics/top-movers`
+- `GET /analytics/portfolio-performance?range=1M|3M|6M`
+
+## Build
+
+```bash
+cd frontend
+npm run build
 ```
 
 ## Notes
 
-EquityFlow is a prototype. Demo data is illustrative and should not be treated
-as financial advice.
+EquityFlow is a prototype and educational project. Seeded data and analytics
+are illustrative and should not be treated as financial advice.

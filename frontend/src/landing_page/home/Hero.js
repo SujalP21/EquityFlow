@@ -3,20 +3,20 @@ import { Link } from "react-router-dom";
 
 function Hero() {
   const previewRows = [
-    ["Portfolio health", "82", "Stable"],
-    ["Sector exposure", "Financials", "28%"],
-    ["Top contributor", "INFY", "+15.18%"],
+    ["INFY", "BUY", "EXECUTED"],
+    ["ADANIGREEN", "SELL", "REJECTED"],
+    ["TCS", "BUY", "EXECUTED"],
   ];
 
   return (
     <section className="hero-section">
       <div className="hero-section__copy">
         <p className="eyebrow">Investment analytics workspace</p>
-        <h1>Understand what is driving your portfolio.</h1>
+        <h1>A professional portfolio desk for holdings, orders, and signals.</h1>
         <p className="hero-section__lead">
-          EquityFlow turns holdings, watchlists, and market movement into a
-          calm workspace for portfolio health, sector exposure, and actionable
-          review signals.
+          EquityFlow brings portfolio health, watchlists, stock details, order
+          history, and trading analytics into one warm-light workspace built for
+          daily review.
         </p>
         <div className="hero-section__actions">
           <Link className="button button--primary" to="/signup">
@@ -28,32 +28,51 @@ function Hero() {
         </div>
       </div>
 
-      <div className="product-preview" aria-label="EquityFlow dashboard preview">
+      <div className="product-preview product-preview--terminal" aria-label="EquityFlow dashboard preview">
+        <div className="product-preview__topbar">
+          <span>Overview</span>
+          <span>Portfolio</span>
+          <span>Orders</span>
+        </div>
         <div className="product-preview__header">
           <div>
-            <span className="eyebrow">Overview</span>
-            <h2>Portfolio Health</h2>
+            <span className="eyebrow">Live workspace</span>
+            <h2>Portfolio Value</h2>
           </div>
-          <strong>82</strong>
+          <strong>₹3.42L</strong>
         </div>
         <div className="product-preview__meter">
-          <span style={{ width: "82%" }} />
+          <span style={{ width: "76%" }} />
         </div>
         <div className="product-preview__grid">
           <div>
-            <span>Current value</span>
-            <strong>31.43k</strong>
+            <span>Health score</span>
+            <strong>82</strong>
           </div>
           <div>
             <span>Total return</span>
             <strong className="positive">+5.20%</strong>
           </div>
           <div>
-            <span>Cash ready</span>
-            <strong>3.74k</strong>
+            <span>Orders</span>
+            <strong>18</strong>
           </div>
         </div>
+        <div className="preview-chart" aria-hidden="true">
+          <span style={{ height: "42%" }} />
+          <span style={{ height: "58%" }} />
+          <span style={{ height: "51%" }} />
+          <span style={{ height: "74%" }} />
+          <span style={{ height: "67%" }} />
+          <span style={{ height: "86%" }} />
+          <span style={{ height: "79%" }} />
+        </div>
         <div className="mini-table">
+          <div className="mini-table__head">
+            <span>Symbol</span>
+            <span>Side</span>
+            <span>Status</span>
+          </div>
           {previewRows.map((row) => (
             <div className="mini-table__row" key={row[0]}>
               <span>{row[0]}</span>

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { positions } from "../data/data";
 import apiClient from "../../api/client";
+import { getStockDetailPath } from "../../constants/routes";
+import { formatCurrency } from "../../utils/formatters";
 
 const Positions = () => {
   const [remotePositions, setRemotePositions] = useState([]);
@@ -51,16 +54,22 @@ const Positions = () => {
             const isProfit = curValue - stock.avg * stock.qty >= 0.0;
             const profClass = isProfit ? "profit" : "loss";
             const dayClass = stock.isLoss ? "loss" : "profit";
+            const instrument = stock.symbol || stock.name;
 
             return (
-              <tr key={`${stock.name}-${index}`}>
+              <tr key={`${instrument}-${index}`}>
                 <td data-label="Product">{stock.product}</td>
-                <td data-label="Instrument">{stock.name}</td>
+                <td data-label="Instrument">
+                  <Link className="symbol-link" to={getStockDetailPath(instrument)}>
+                    {instrument}
+                  </Link>
+                </td>
                 <td data-label="Qty.">{stock.qty}</td>
-                <td data-label="Avg.">{stock.avg.toFixed(2)}</td>
-                <td data-label="LTP">{stock.price.toFixed(2)}</td>
+                <td data-label="Avg.">{formatCurrency(stock.avg)}</td>
+                <td data-label="LTP">{formatCurrency(stock.price)}</td>
                 <td data-label="P&L" className={profClass}>
-                  {(curValue - stock.avg * stock.qty).toFixed(2)}
+                  {curValue - stock.avg * stock.qty >= 0 ? "+" : ""}
+                  {formatCurrency(curValue - stock.avg * stock.qty)}
                 </td>
                 <td data-label="Chg." className={dayClass}>
                   {stock.day}

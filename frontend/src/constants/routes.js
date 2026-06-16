@@ -15,4 +15,8 @@ export const DASHBOARD_ROUTES = {
   WATCHLIST: "/watchlist",
   INSIGHTS: "/insights",
   SETTINGS: "/settings",
+  STOCK_DETAIL: "/stock/:symbol",
 };
+
+export const getStockDetailPath = (symbol) =>
+  `/stock/${encodeURIComponent(String(symbol || "").toUpperCase())}`;

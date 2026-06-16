@@ -6,8 +6,8 @@ const navItems = [
   { label: "Overview", to: DASHBOARD_ROUTES.OVERVIEW },
   { label: "Portfolio", to: DASHBOARD_ROUTES.PORTFOLIO },
   { label: "Watchlist", to: DASHBOARD_ROUTES.WATCHLIST },
+  { label: "Orders", to: "/orders" },
   { label: "Insights", to: DASHBOARD_ROUTES.INSIGHTS },
-  { label: "Settings", to: DASHBOARD_ROUTES.SETTINGS },
 ];
 
 const Menu = () => {
@@ -41,6 +41,15 @@ const Menu = () => {
         <div className="avatar">EF</div>
         <p className="username">Investor</p>
       </div>
+
+      <NavLink
+        to={DASHBOARD_ROUTES.SETTINGS}
+        className={({ isActive }) =>
+          isActive ? "menu menu--utility selected" : "menu menu--utility"
+        }
+      >
+        Settings
+      </NavLink>
     </div>
   );
 };

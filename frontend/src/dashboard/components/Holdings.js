@@ -1,11 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import Positions from "./Positions";
-import { holdings as fallbackHoldings, sectorExposure } from "../data/data";
-import { VerticalGraph } from "./VerticalGraph";
+import { holdings as fallbackHoldings } from "../data/data";
 import apiClient from "../../api/client";
-
-const formatNumber = (value) =>
-  value.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+import {
+  getAllocation,
+  getPortfolioPerformance,
+  getSectorExposure,
+} from "../../api/analytics";
+import AllocationChart from "../../charts/AllocationChart";
+import PortfolioPerformanceChart from "../../charts/PortfolioPerformanceChart";
+import SectorExposureChart from "../../charts/SectorExposureChart";
+import { getStockDetailPath } from "../../constants/routes";
+import { formatCurrency, formatPercent } from "../../utils/formatters";
 
 const HoldingsTable = ({ holdings }) => {
   if (!holdings.length) {
@@ -44,13 +51,18 @@ const HoldingsTable = ({ holdings }) => {
 
             return (
               <tr key={`${instrument}-${index}`}>
-                <td data-label="Instrument">{instrument}</td>
+                <td data-label="Instrument">
+                  <Link className="symbol-link" to={getStockDetailPath(instrument)}>
+                    {instrument}
+                  </Link>
+                </td>
                 <td data-label="Qty.">{stock.qty}</td>
-                <td data-label="Avg. cost">{stock.avg.toFixed(2)}</td>
-                <td data-label="LTP">{stock.price.toFixed(2)}</td>
-                <td data-label="Cur. val">{curValue.toFixed(2)}</td>
+                <td data-label="Avg. cost">{formatCurrency(stock.avg)}</td>
+                <td data-label="LTP">{formatCurrency(stock.price)}</td>
+                <td data-label="Cur. val">{formatCurrency(curValue)}</td>
                 <td data-label="P&L" className={profClass}>
-                  {pnl.toFixed(2)}
+                  {pnl >= 0 ? "+" : ""}
+                  {formatCurrency(pnl)}
                 </td>
                 <td data-label="Net chg." className={profClass}>
                   {stock.net}
@@ -71,6 +83,9 @@ const Holdings = () => {
   const [activeTab, setActiveTab] = useState("holdings");
   const [remoteHoldings, setRemoteHoldings] = useState([]);
   const [didHoldingsRequestFail, setDidHoldingsRequestFail] = useState(false);
+  const [allocation, setAllocation] = useState([]);
+  const [sectorExposure, setSectorExposure] = useState([]);
+  const [performance, setPerformance] = useState([]);
 
   useEffect(() => {
     apiClient
@@ -82,6 +97,22 @@ const Holdings = () => {
       .catch(() => {
         setRemoteHoldings([]);
         setDidHoldingsRequestFail(true);
+      });
+
+    Promise.all([
+      getAllocation(),
+      getSectorExposure(),
+      getPortfolioPerformance("3M"),
+    ])
+      .then(([allocationRes, sectorRes, performanceRes]) => {
+        setAllocation(allocationRes.data);
+        setSectorExposure(sectorRes.data);
+        setPerformance(performanceRes.data);
+      })
+      .catch(() => {
+        setAllocation([]);
+        setSectorExposure([]);
+        setPerformance([]);
       });
   }, []);
 
@@ -100,76 +131,56 @@ const Holdings = () => {
     return { invested, current, pnl };
   }, [allHoldings]);
 
-  const chartData = {
-    labels: allHoldings.map((stock) => stock.name),
-    datasets: [
-      {
-        label: "Current value",
-        data: allHoldings.map((stock) => stock.price * stock.qty),
-        backgroundColor: "#285e4d",
-        borderRadius: 6,
-      },
-    ],
-  };
-
   return (
     <section className="dashboard-page">
       <div className="page-header">
         <div>
           <p className="eyebrow">Portfolio</p>
-          <h1>Holdings and positions in one workspace</h1>
+          <h1>Portfolio workspace</h1>
         </div>
       </div>
 
-      <div className="metric-grid">
-        <article className="metric-card">
+      <div className="trading-strip portfolio-summary-strip">
+        <article className="strip-metric">
           <span>Total investment</span>
-          <strong>{formatNumber(totals.invested)}</strong>
+          <strong>{formatCurrency(totals.invested)}</strong>
           <p>Cost basis</p>
         </article>
-        <article className="metric-card">
+        <article className="strip-metric">
           <span>Current value</span>
-          <strong>{formatNumber(totals.current)}</strong>
+          <strong>{formatCurrency(totals.current)}</strong>
           <p>Marked to latest price</p>
         </article>
-        <article className="metric-card">
+        <article className="strip-metric">
           <span>Unrealized P&L</span>
           <strong className={totals.pnl >= 0 ? "positive" : "negative"}>
             {totals.pnl >= 0 ? "+" : ""}
-            {formatNumber(totals.pnl)}
+            {formatCurrency(totals.pnl)}
           </strong>
           <p>
             {totals.invested > 0
-              ? `${((totals.pnl / totals.invested) * 100).toFixed(2)}% return`
+              ? `${formatPercent((totals.pnl / totals.invested) * 100)} return`
               : "No holdings yet"}
           </p>
         </article>
+        <article className="strip-metric">
+          <span>Holdings</span>
+          <strong>{allHoldings.length}</strong>
+          <p>Active instruments</p>
+        </article>
       </div>
 
-      <section className="panel">
+      <section className="panel trading-chart-panel portfolio-performance-panel">
         <div className="panel__header">
           <div>
-            <p className="eyebrow">Sector exposure</p>
-            <h2>Summary cards</h2>
+            <p className="eyebrow">Performance</p>
+            <h2>Portfolio value over 3 months</h2>
           </div>
         </div>
-        <div className="sector-grid">
-          {sectorExposure.map((sector) => (
-            <article className="sector-card" key={sector.name}>
-              <div>
-                <strong>{sector.name}</strong>
-                <span>{sector.value}</span>
-              </div>
-              <div className="sector-card__bar">
-                <span style={{ width: `${sector.weight}%` }} />
-              </div>
-              <p>{sector.weight}% - {sector.note}</p>
-            </article>
-          ))}
-        </div>
+        <PortfolioPerformanceChart data={performance} />
       </section>
 
-      <section className="panel">
+      <section className="panel portfolio-table-panel">
         <div className="tabs" role="tablist" aria-label="Portfolio tabs">
           <button
             className={activeTab === "holdings" ? "tab active" : "tab"}
@@ -190,8 +201,39 @@ const Holdings = () => {
         {activeTab === "holdings" ? (
           <>
             <HoldingsTable holdings={allHoldings} />
-            <div className="chart-panel">
-              <VerticalGraph data={chartData} />
+            <div className="dashboard-grid dashboard-grid--two chart-grid portfolio-support-grid">
+              <section className="support-panel">
+                <div className="panel__header">
+                  <div>
+                    <p className="eyebrow">Allocation</p>
+                    <h2>Capital by symbol</h2>
+                  </div>
+                </div>
+                <AllocationChart data={allocation} />
+              </section>
+              <section className="support-panel">
+                <div className="panel__header">
+                  <div>
+                    <p className="eyebrow">Sector mix</p>
+                    <h2>Capital by sector</h2>
+                  </div>
+                </div>
+                <SectorExposureChart data={sectorExposure} />
+              </section>
+            </div>
+            <div className="sector-grid sector-grid--compact portfolio-sector-strip">
+              {sectorExposure.map((sector) => (
+                <article className="sector-card" key={sector.sector}>
+                  <div>
+                    <strong>{sector.sector}</strong>
+                    <span>{formatCurrency(sector.value)}</span>
+                  </div>
+                  <div className="sector-card__bar">
+                    <span style={{ width: `${sector.percentage}%` }} />
+                  </div>
+                  <p>{formatPercent(sector.percentage, { showSign: false })} of portfolio</p>
+                </article>
+              ))}
             </div>
           </>
         ) : (

@@ -1,64 +1,89 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { holdings as fallbackHoldings, sectorExposure, watchlist } from "../data/data";
+import React, { useEffect, useState } from "react";
+import {
+  getAllocation,
+  getOverview,
+  getPortfolioPerformance,
+  getSectorExposure,
+  getTopMovers,
+} from "../../api/analytics";
 import apiClient from "../../api/client";
-
-const formatCurrency = (value) =>
-  value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+import PortfolioPerformanceChart from "../../charts/PortfolioPerformanceChart";
+import TopMoversTable from "../../charts/TopMoversTable";
+import { formatCurrency, formatPercent } from "../../utils/formatters";
 
 const Summary = () => {
-  const [remoteHoldings, setRemoteHoldings] = useState([]);
-  const [didHoldingsRequestFail, setDidHoldingsRequestFail] = useState(false);
+  const [overview, setOverview] = useState(null);
+  const [allocation, setAllocation] = useState([]);
+  const [performance, setPerformance] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [sectors, setSectors] = useState([]);
+  const [topMovers, setTopMovers] = useState([]);
+  const [didAnalyticsRequestFail, setDidAnalyticsRequestFail] = useState(false);
 
   useEffect(() => {
-    apiClient
-      .get("/allHoldings")
-      .then((res) => {
-        setRemoteHoldings(res.data);
-        setDidHoldingsRequestFail(false);
+    Promise.all([
+      getOverview(),
+      getSectorExposure(),
+      getTopMovers(),
+      getPortfolioPerformance("3M"),
+      getAllocation(),
+    ])
+      .then(([overviewRes, sectorRes, moversRes, performanceRes, allocationRes]) => {
+        setOverview(overviewRes.data);
+        setSectors(sectorRes.data);
+        setTopMovers(moversRes.data);
+        setPerformance(performanceRes.data);
+        setAllocation(allocationRes.data);
+        setDidAnalyticsRequestFail(false);
       })
       .catch(() => {
-        setRemoteHoldings([]);
-        setDidHoldingsRequestFail(true);
+        setOverview(null);
+        setSectors([]);
+        setTopMovers([]);
+        setPerformance([]);
+        setAllocation([]);
+        setDidAnalyticsRequestFail(true);
       });
+
+    apiClient
+      .get("/orders")
+      .then((res) => setRecentOrders(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setRecentOrders([]));
   }, []);
 
-  const holdings = didHoldingsRequestFail ? fallbackHoldings : remoteHoldings;
-  const hasHoldings = holdings.length > 0;
-
-  const totals = useMemo(() => {
-    const invested = holdings.reduce((sum, stock) => sum + stock.avg * stock.qty, 0);
-    const current = holdings.reduce((sum, stock) => sum + stock.price * stock.qty, 0);
-    const pnl = current - invested;
-    const returnPercent = invested > 0 ? (pnl / invested) * 100 : 0;
-    return { invested, current, pnl, returnPercent };
-  }, [holdings]);
-
-  const healthScore = hasHoldings ? 82 : 0;
-  const topMovers = [...watchlist]
-    .sort((a, b) => Math.abs(parseFloat(b.percent)) - Math.abs(parseFloat(a.percent)))
-    .slice(0, 4);
+  const hasHoldings = overview?.investedValue > 0;
+  const dailyPulse =
+    topMovers.length > 0
+      ? topMovers.reduce((sum, stock) => sum + stock.dayChangePercent, 0) /
+        topMovers.length
+      : 0;
 
   const metrics = [
     {
-      label: "Current value",
-      value: formatCurrency(totals.current),
+      label: "Portfolio value",
+      value: formatCurrency(overview?.currentValue || 0),
       detail: hasHoldings ? "Across your holdings" : "No holdings yet",
     },
     {
+      label: "Today's change",
+      value: formatPercent(dailyPulse),
+      detail: topMovers.length ? "Average watched move" : "Awaiting market data",
+      tone: dailyPulse >= 0 ? "positive" : "negative",
+    },
+    {
       label: "Total P&L",
-      value: `${totals.pnl >= 0 ? "+" : ""}${formatCurrency(totals.pnl)}`,
-      detail: `${totals.returnPercent.toFixed(2)}% overall`,
-      tone: totals.pnl >= 0 ? "positive" : "negative",
+      value: `${(overview?.pnl || 0) >= 0 ? "+" : ""}${formatCurrency(
+        overview?.pnl || 0
+      )}`,
+      detail: `${formatPercent(overview?.pnlPercent || 0)} overall`,
+      tone: (overview?.pnl || 0) >= 0 ? "positive" : "negative",
     },
     {
-      label: "Cash ready",
-      value: "3.74k",
-      detail: "Available for allocation",
-    },
-    {
-      label: "Largest exposure",
-      value: sectorExposure[0].name,
-      detail: `${sectorExposure[0].weight}% of portfolio`,
+      label: "Holdings count",
+      value: allocation.length,
+      detail: hasHoldings
+        ? `${overview?.largestSector || "Mixed"} leads allocation`
+        : "No active holdings",
     },
   ];
 
@@ -69,60 +94,63 @@ const Summary = () => {
           <p className="eyebrow">Overview</p>
           <h1>Portfolio clarity at a glance</h1>
         </div>
-        <span className="page-header__meta">Last refreshed today</span>
+        <span className="page-header__meta">
+          {didAnalyticsRequestFail ? "Analytics unavailable" : "Live analytics"}
+        </span>
       </div>
 
-      <div className="overview-grid">
-        <article className="health-card">
+      <div className="trading-strip overview-strip">
+        {metrics.map((metric) => (
+          <article className="strip-metric" key={metric.label}>
+            <span>{metric.label}</span>
+            <strong className={metric.tone || ""}>{metric.value}</strong>
+            <p>{metric.detail}</p>
+          </article>
+        ))}
+      </div>
+
+      <section className="panel trading-chart-panel">
+        <div className="panel__header">
           <div>
-            <p className="eyebrow">Portfolio Health Score</p>
-            <h2>{healthScore}</h2>
-            <p>
-              {hasHoldings
-                ? "Stable score supported by positive return, cash availability, and a manageable sector mix."
-                : "Add holdings to calculate a user-specific portfolio health score."}
-            </p>
+            <p className="eyebrow">Portfolio performance</p>
+            <h2>Value trend</h2>
           </div>
-          <div className="health-card__meter">
-            <span style={{ width: `${healthScore}%` }} />
-          </div>
-        </article>
-
-        <div className="metric-grid">
-          {metrics.map((metric) => (
-            <article className="metric-card" key={metric.label}>
-              <span>{metric.label}</span>
-              <strong className={metric.tone || ""}>{metric.value}</strong>
-              <p>{metric.detail}</p>
-            </article>
-          ))}
+          <span className="page-header__meta">
+            Health score {overview?.healthScore || 0}
+          </span>
         </div>
-      </div>
+        <PortfolioPerformanceChart data={performance} />
+      </section>
 
-      <div className="dashboard-grid dashboard-grid--two">
+      <div className="dashboard-grid dashboard-grid--two overview-market-grid">
         <section className="panel">
           <div className="panel__header">
             <div>
-              <p className="eyebrow">Sector exposure</p>
+              <p className="eyebrow">Sector allocation</p>
               <h2>Capital by theme</h2>
             </div>
           </div>
-          <div className="sector-grid">
-            {sectorExposure.map((sector) => (
-              <article className="sector-card" key={sector.name}>
-                <div>
-                  <strong>{sector.name}</strong>
-                  <span>{sector.value}</span>
-                </div>
-                <div className="sector-card__bar">
-                  <span style={{ width: `${sector.weight}%` }} />
-                </div>
-                <p>
-                  {sector.weight}% - {sector.note}
-                </p>
-              </article>
-            ))}
-          </div>
+          {sectors.length ? (
+            <div className="sector-grid sector-grid--compact">
+              {sectors.map((sector) => (
+                <article className="sector-card" key={sector.sector}>
+                  <div>
+                    <strong>{sector.sector}</strong>
+                    <span>{formatCurrency(sector.value)}</span>
+                  </div>
+                  <div className="sector-card__bar">
+                    <span style={{ width: `${sector.percentage}%` }} />
+                  </div>
+                  <p>{formatPercent(sector.percentage, { showSign: false })} of portfolio</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <h3>No sector exposure</h3>
+              <p>Sector analytics will appear after holdings are available.</p>
+            </div>
+          )}
         </section>
 
         <section className="panel">
@@ -132,22 +160,75 @@ const Summary = () => {
               <h2>What changed today</h2>
             </div>
           </div>
-          <div className="data-table data-table--compact">
-            <div className="data-table__head">
-              <span>Symbol</span>
-              <span>Price</span>
-              <span>Day</span>
+          <TopMoversTable data={topMovers} />
+        </section>
+      </div>
+
+      <div className="dashboard-grid dashboard-grid--two activity-grid">
+        <section className="panel">
+          <div className="panel__header">
+            <div>
+              <p className="eyebrow">Recent activity</p>
+              <h2>Portfolio signals</h2>
             </div>
-            {topMovers.map((stock) => (
-              <div className="data-table__row" key={stock.name}>
-                <strong>{stock.name}</strong>
-                <span>{stock.price.toFixed(2)}</span>
-                <span className={stock.isDown ? "negative" : "positive"}>
-                  {stock.percent}
-                </span>
-              </div>
-            ))}
           </div>
+          <div className="data-table data-table--compact activity-table">
+            <div className="data-table__head">
+              <span>Signal</span>
+              <span>Value</span>
+              <span>Status</span>
+            </div>
+            <div className="data-table__row">
+              <strong>Health score</strong>
+              <span>{overview?.healthScore || 0}</span>
+              <span>{hasHoldings ? "Active" : "Waiting"}</span>
+            </div>
+            <div className="data-table__row">
+              <strong>Largest exposure</strong>
+              <span>{overview?.largestSector || "None"}</span>
+              <span>{hasHoldings ? "Tracked" : "None"}</span>
+            </div>
+            <div className="data-table__row">
+              <strong>Cash ready</strong>
+              <span>{formatCurrency(overview?.cashReady || 0)}</span>
+              <span>Available</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panel__header">
+            <div>
+              <p className="eyebrow">Recent Trading Activity</p>
+              <h2>Latest orders</h2>
+            </div>
+          </div>
+          {recentOrders.length ? (
+            <div className="data-table data-table--compact orders-mini-table">
+              <div className="data-table__head">
+                <span>Symbol</span>
+                <span>Side</span>
+                <span>Status</span>
+              </div>
+              {recentOrders.slice(0, 5).map((order, index) => (
+                <div
+                  className="data-table__row"
+                  key={order.id || order._id || `${order.symbol || order.name}-${index}`}
+                >
+                  <strong>{order.symbol || order.name}</strong>
+                  <span>{order.mode}</span>
+                  <span className={order.status === "REJECTED" ? "negative" : "positive"}>
+                    {order.status || "EXECUTED"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <h3>No recent orders</h3>
+              <p>Executed orders will appear here after trading activity.</p>
+            </div>
+          )}
         </section>
       </div>
     </section>

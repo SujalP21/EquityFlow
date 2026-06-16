@@ -1,7 +1,15 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import GeneralContext from "./GeneralContext";
-import { getStocks } from "../../api/stocks";
+import { getStock, getStockHistory, getStocks } from "../../api/stocks";
+import StockPriceHistoryChart from "../../charts/StockPriceHistoryChart";
+import { getStockDetailPath } from "../../constants/routes";
+import {
+  formatCompactNumber,
+  formatCurrency,
+  formatPercent,
+} from "../../utils/formatters";
 
 import { Tooltip, Grow } from "@mui/material";
 
@@ -28,7 +36,7 @@ const mapStockToWatchlistItem = (stock) => {
     sector: stock.sector,
     logoUrl: stock.logoUrl,
     price,
-    percent: `${changePercent >= 0 ? "+" : ""}${changePercent.toFixed(2)}%`,
+    percent: formatPercent(changePercent),
     isDown: changePercent < 0,
     signal: stock.sector ? `${stock.sector} exposure` : stock.signal,
   };
@@ -121,7 +129,7 @@ const WatchList = () => {
                   stock={stock}
                   key={stock.symbol}
                   isSelected={selectedAsset?.symbol === stock.symbol}
-                  onSelect={setSelectedAsset}
+                  onSelect={() => setSelectedAsset(stock)}
                 />
               ))}
             </ul>
@@ -158,7 +166,7 @@ const WatchListItem = ({ stock, isSelected, onSelect }) => {
           ) : (
             <KeyboardArrowUp className="positive" />
           )}
-          <strong>{stock.price.toFixed(2)}</strong>
+          <strong>{formatCurrency(stock.price)}</strong>
         </div>
       </button>
     </li>
@@ -166,6 +174,35 @@ const WatchListItem = ({ stock, isSelected, onSelect }) => {
 };
 
 const AssetDetail = ({ stock }) => {
+  const navigate = useNavigate();
+  const [stockDetail, setStockDetail] = useState(null);
+  const [priceHistory, setPriceHistory] = useState([]);
+  const [yearHistory, setYearHistory] = useState([]);
+
+  useEffect(() => {
+    if (!stock?.symbol) return;
+
+    setStockDetail(null);
+    setPriceHistory([]);
+    setYearHistory([]);
+
+    Promise.all([
+      getStock(stock.symbol),
+      getStockHistory(stock.symbol, { range: "3M" }),
+      getStockHistory(stock.symbol, { range: "1Y" }),
+    ])
+      .then(([detailRes, historyRes, yearHistoryRes]) => {
+        setStockDetail(detailRes.data);
+        setPriceHistory(historyRes.data.data);
+        setYearHistory(yearHistoryRes.data.data);
+      })
+      .catch(() => {
+        setStockDetail(null);
+        setPriceHistory([]);
+        setYearHistory([]);
+      });
+  }, [stock?.symbol]);
+
   if (!stock) {
     return (
       <section className="panel asset-detail">
@@ -176,6 +213,14 @@ const AssetDetail = ({ stock }) => {
       </section>
     );
   }
+
+  const detail = stockDetail || stock;
+  const high52Week = yearHistory.length
+    ? Math.max(...yearHistory.map((row) => row.high || row.close || 0))
+    : null;
+  const low52Week = yearHistory.length
+    ? Math.min(...yearHistory.map((row) => row.low || row.close || 0))
+    : null;
 
   return (
     <section className="panel asset-detail">
@@ -197,32 +242,56 @@ const AssetDetail = ({ stock }) => {
           <span>{stock.symbol.slice(0, 2)}</span>
         )}
         <div>
-          <strong>{stock.companyName || stock.displayName}</strong>
-          <p>{stock.sector || stock.signal}</p>
+          <strong>{detail.companyName || stock.companyName || stock.displayName}</strong>
+          <p>{detail.sector || stock.sector || stock.signal}</p>
         </div>
       </div>
 
       <div className="asset-price-card">
         <span>Last traded price</span>
-        <strong>{stock.price.toFixed(2)}</strong>
+        <strong>{formatCurrency(stock.price)}</strong>
         <p>{stock.signal}</p>
       </div>
 
-      <div className="mini-chart" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-        <span />
-        <span />
-        <span />
+      <div className="stock-meta-grid">
+        <article>
+          <span>Industry</span>
+          <strong>{detail.industry || "Not available"}</strong>
+        </article>
+        <article>
+          <span>Market cap</span>
+          <strong>
+            {detail.fundamentals?.marketCap
+              ? formatCompactNumber(detail.fundamentals.marketCap)
+              : "Not available"}
+          </strong>
+        </article>
+        <article>
+          <span>52 week high</span>
+          <strong>{high52Week ? formatCurrency(high52Week) : "Not available"}</strong>
+        </article>
+        <article>
+          <span>52 week low</span>
+          <strong>{low52Week ? formatCurrency(low52Week) : "Not available"}</strong>
+        </article>
+        <article>
+          <span>Currency</span>
+          <strong>{detail.currency || "INR"}</strong>
+        </article>
       </div>
 
-      <WatchListActions uid={stock.symbol} price={stock.price} />
+      <StockPriceHistoryChart data={priceHistory} />
+
+      <WatchListActions
+        uid={stock.symbol}
+        price={stock.price}
+        onOpenDetail={() => navigate(getStockDetailPath(stock.symbol))}
+      />
     </section>
   );
 };
 
-const WatchListActions = ({ uid, price }) => {
+const WatchListActions = ({ uid, price, onOpenDetail }) => {
   const generalContext = useContext(GeneralContext);
 
   const handleBuyClick = () => {
@@ -257,8 +326,8 @@ const WatchListActions = ({ uid, price }) => {
           Sell
         </button>
       </Tooltip>
-      <Tooltip title="Analytics" placement="top" arrow TransitionComponent={Grow}>
-        <button className="action" type="button">
+      <Tooltip title="Open detail" placement="top" arrow TransitionComponent={Grow}>
+        <button className="action" type="button" onClick={onOpenDetail}>
           <BarChartOutlined className="icon" />
         </button>
       </Tooltip>

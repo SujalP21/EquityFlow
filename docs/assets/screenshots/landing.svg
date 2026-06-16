@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-label="EquityFlow landing page preview">
+  <rect width="1200" height="760" fill="#f7f5f0"/>
+  <rect x="52" y="36" width="1096" height="58" rx="8" fill="#ffffff" stroke="#ddd8ce"/>
+  <rect x="72" y="50" width="30" height="30" rx="7" fill="#285e4d"/>
+  <text x="116" y="71" fill="#17201a" font-family="Inter, Arial" font-size="18" font-weight="700">EquityFlow</text>
+  <text x="746" y="71" fill="#687067" font-family="Inter, Arial" font-size="14" font-weight="700">Product</text>
+  <text x="830" y="71" fill="#687067" font-family="Inter, Arial" font-size="14" font-weight="700">Pricing</text>
+  <rect x="1018" y="48" width="96" height="34" rx="7" fill="#285e4d"/>
+  <text x="1048" y="70" fill="#ffffff" font-family="Inter, Arial" font-size="14" font-weight="700">Login</text>
+  <text x="72" y="176" fill="#b46a35" font-family="Inter, Arial" font-size="13" font-weight="800">INVESTMENT ANALYTICS WORKSPACE</text>
+  <text x="72" y="238" fill="#17201a" font-family="Inter, Arial" font-size="48" font-weight="800">A professional portfolio desk</text>
+  <text x="72" y="292" fill="#17201a" font-family="Inter, Arial" font-size="48" font-weight="800">for holdings, orders, and signals.</text>
+  <text x="72" y="340" fill="#687067" font-family="Inter, Arial" font-size="18">Warm-light trading analytics for review, allocation, and execution history.</text>
+  <rect x="72" y="386" width="134" height="42" rx="7" fill="#285e4d"/>
+  <text x="100" y="412" fill="#ffffff" font-family="Inter, Arial" font-size="15" font-weight="700">Get Started</text>
+  <rect x="548" y="138" width="580" height="450" rx="8" fill="#ffffff" stroke="#ddd8ce"/>
+  <rect x="572" y="162" width="86" height="32" rx="7" fill="#fbfaf7" stroke="#ddd8ce"/>
+  <rect x="666" y="162" width="88" height="32" rx="7" fill="#fbfaf7" stroke="#ddd8ce"/>
+  <rect x="762" y="162" width="72" height="32" rx="7" fill="#fbfaf7" stroke="#ddd8ce"/>
+  <text x="572" y="244" fill="#687067" font-family="Inter, Arial" font-size="13" font-weight="800">LIVE WORKSPACE</text>
+  <text x="572" y="284" fill="#17201a" font-family="Inter, Arial" font-size="24" font-weight="800">Portfolio Value</text>
+  <text x="914" y="284" fill="#285e4d" font-family="Inter, Arial" font-size="34" font-weight="800">INR 3.42L</text>
+  <rect x="572" y="318" width="532" height="10" rx="5" fill="#f0ece4"/>
+  <rect x="572" y="318" width="408" height="10" rx="5" fill="#285e4d"/>
+  <rect x="572" y="366" width="532" height="142" rx="8" fill="#fbfaf7" stroke="#ddd8ce"/>
+  <rect x="604" y="452" width="38" height="36" rx="5" fill="#285e4d"/>
+  <rect x="674" y="428" width="38" height="60" rx="5" fill="#285e4d"/>
+  <rect x="744" y="398" width="38" height="90" rx="5" fill="#285e4d"/>
+  <rect x="814" y="414" width="38" height="74" rx="5" fill="#285e4d"/>
+  <rect x="884" y="382" width="38" height="106" rx="5" fill="#285e4d"/>
+  <rect x="954" y="402" width="38" height="86" rx="5" fill="#285e4d"/>
+  <rect x="1024" y="370" width="38" height="118" rx="5" fill="#285e4d"/>
+</svg>
