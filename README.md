@@ -11,9 +11,6 @@ an Express/MongoDB API.
 
 ## Screenshots
 
-Replace the placeholder PNGs in `docs/screenshots/` with real screenshots using
-the same filenames.
-
 ### Landing Page
 
 ![Landing Page](docs/screenshots/landing-page.png)
@@ -37,14 +34,6 @@ the same filenames.
 ### Orders
 
 ![Orders](docs/screenshots/orders.png)
-
-### Insights
-
-![Insights](docs/screenshots/insights.png)
-
-### Mobile Experience
-
-![Mobile Experience](docs/screenshots/mobile-dashboard.png)
 
 ## Features
 
