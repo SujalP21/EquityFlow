@@ -2350,3 +2350,159 @@ input:focus-visible,
     -webkit-overflow-scrolling: touch;
   }
 }
+
+/* Final responsive navigation and chart safety fixes */
+.dashboard-nav-toggle {
+  display: none;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.dashboard-brand--mobile {
+  display: none;
+}
+
+.chart-panel,
+.chart-panel--recharts,
+.chart-panel--compact,
+.trading-chart-panel,
+.support-panel,
+.stock-chart-dominant,
+.orders-chart-panel {
+  min-width: 0;
+}
+
+.chart-panel {
+  width: 100%;
+  min-height: 260px;
+  overflow: hidden;
+}
+
+.chart-panel--compact {
+  min-height: 240px;
+}
+
+.recharts-responsive-container {
+  min-width: 0 !important;
+  min-height: 220px !important;
+}
+
+@media (max-width: 1020px) {
+  .topbar-container {
+    position: sticky;
+    top: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dashboard-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .dashboard-brand--mobile {
+    display: inline-flex;
+    grid-column: 1;
+    grid-row: 1;
+    width: max-content;
+  }
+
+  .topbar-container .menu-container {
+    display: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .topbar-container.is-open .menu-container {
+    display: flex;
+  }
+
+  .topbar-container .menu-container .dashboard-brand {
+    display: inline-flex;
+  }
+
+  .topbar-container .menus {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .topbar-container .menu,
+  .topbar-container .menu--utility {
+    display: flex;
+    justify-content: center;
+    min-height: 40px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .topbar-container .profile {
+    display: flex;
+    margin: 0;
+  }
+
+  .topbar-status {
+    display: flex !important;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .logout-button {
+    width: auto;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .topbar-container .menus {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-status {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .logout-button {
+    width: 100%;
+  }
+
+  .chart-panel,
+  .chart-panel--recharts {
+    min-height: 260px;
+  }
+
+  .chart-panel--compact,
+  .stock-detail-page .chart-panel--compact,
+  .stock-chart-dominant .chart-panel--compact {
+    min-height: 280px;
+  }
+
+  .recharts-responsive-container {
+    min-height: 240px !important;
+  }
+}

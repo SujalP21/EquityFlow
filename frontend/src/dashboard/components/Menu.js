@@ -10,13 +10,14 @@ const navItems = [
   { label: "Insights", to: DASHBOARD_ROUTES.INSIGHTS },
 ];
 
-const Menu = () => {
+const Menu = ({ onNavigate }) => {
   return (
-    <div className="menu-container">
+    <div className="menu-container" id="dashboard-navigation">
       <NavLink
         className="dashboard-brand"
         to={DASHBOARD_ROUTES.OVERVIEW}
         aria-label="EquityFlow"
+        onClick={onNavigate}
       >
         <span>EF</span>
         <strong>EquityFlow</strong>
@@ -28,6 +29,7 @@ const Menu = () => {
             key={item.label}
             to={item.to}
             end={item.to === DASHBOARD_ROUTES.OVERVIEW}
+            onClick={onNavigate}
             className={({ isActive }) =>
               isActive ? "menu selected" : "menu"
             }
@@ -44,6 +46,7 @@ const Menu = () => {
 
       <NavLink
         to={DASHBOARD_ROUTES.SETTINGS}
+        onClick={onNavigate}
         className={({ isActive }) =>
           isActive ? "menu menu--utility selected" : "menu menu--utility"
         }

@@ -24,7 +24,7 @@ const StockPriceHistoryChart = ({ data }) => {
 
   return (
     <div className="chart-panel chart-panel--compact chart-panel--recharts">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220} debounce={50}>
         <AreaChart data={data} margin={{ top: 12, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid stroke={chartColors.border} vertical={false} />
           <XAxis

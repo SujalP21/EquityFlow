@@ -22,7 +22,7 @@ const SectorExposureChart = ({ data }) => {
 
   return (
     <div className="chart-panel chart-panel--recharts">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220} debounce={50}>
         <PieChart>
           <Pie
             data={data}

@@ -11,21 +11,40 @@ an Express/MongoDB API.
 
 ## Screenshots
 
-| Landing | Overview |
-|---|---|
-| ![Landing page](docs/assets/screenshots/landing.svg) | ![Overview dashboard](docs/assets/screenshots/overview.svg) |
+Replace the placeholder PNGs in `docs/screenshots/` with real screenshots using
+the same filenames.
 
-| Portfolio | Watchlist |
-|---|---|
-| ![Portfolio page](docs/assets/screenshots/portfolio.svg) | ![Watchlist page](docs/assets/screenshots/watchlist.svg) |
+### Landing Page
 
-| Stock Detail | Orders |
-|---|---|
-| ![Stock detail page](docs/assets/screenshots/stock-detail.svg) | ![Orders page](docs/assets/screenshots/orders.svg) |
+![Landing Page](docs/screenshots/landing-page.png)
 
-| Insights | Mobile |
-|---|---|
-| ![Insights page](docs/assets/screenshots/insights.svg) | ![Mobile layout](docs/assets/screenshots/mobile.svg) |
+### Overview
+
+![Overview](docs/screenshots/overview.png)
+
+### Portfolio
+
+![Portfolio](docs/screenshots/portfolio.png)
+
+### Watchlist
+
+![Watchlist](docs/screenshots/watchlist.png)
+
+### Stock Detail
+
+![Stock Detail](docs/screenshots/stock-detail.png)
+
+### Orders
+
+![Orders](docs/screenshots/orders.png)
+
+### Insights
+
+![Insights](docs/screenshots/insights.png)
+
+### Mobile Experience
+
+![Mobile Experience](docs/screenshots/mobile-dashboard.png)
 
 ## Features
 
@@ -75,7 +94,7 @@ EquityFlow/
 │   ├── scripts/              # Seed and migration scripts
 │   ├── services/             # Trading engine and analytics services
 │   └── index.js              # Express app entry
-├── docs/assets/screenshots/  # README screenshot assets
+├── docs/screenshots/         # README screenshot placeholders/assets
 └── frontend/
     ├── public/
     └── src/
